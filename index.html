@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CAT Informes — Reporte de Misiones</title>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #1a2744;
+      --yellow: #f5c800;
+      --yellow-hover: #e0b800;
+      --bg: #f0f2f5;
+      --white: #ffffff;
+      --text: #1a2744;
+      --text-light: #5a6577;
+      --border: #d1d5db;
+      --border-focus: #1a2744;
+      --error: #dc2626;
+      --success-bg: #ecfdf5;
+      --success-border: #10b981;
+      --success-text: #065f46;
+      --radius: 8px;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100dvh;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: var(--navy);
+      color: var(--white);
+      padding: 1.25rem 1rem;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .header h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .header p {
+      font-size: 0.8rem;
+      opacity: 0.75;
+      margin-top: 0.2rem;
+    }
+
+    .header-accent {
+      color: var(--yellow);
+    }
+
+    /* ── Main Container ── */
+    .container {
+      max-width: 540px;
+      margin: 0 auto;
+      padding: 1.25rem 1rem 2rem;
+    }
+
+    /* ── Form ── */
+    .form-group {
+      margin-bottom: 1.1rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+      color: var(--text);
+    }
+
+    .required::after {
+      content: ' *';
+      color: var(--error);
+      font-weight: 400;
+    }
+
+    input[type="text"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 0.7rem 0.85rem;
+      font-size: 1rem;
+      font-family: inherit;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--white);
+      color: var(--text);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235a6577' d='M6 8.825a.7.7 0 0 1-.5-.206L1.205 4.324a.7.7 0 1 1 .99-.99L6 7.14l3.805-3.805a.7.7 0 1 1 .99.99L6.5 8.62a.7.7 0 0 1-.5.206z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.85rem center;
+      padding-right: 2.5rem;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(26, 39, 68, 0.12);
+    }
+
+    /* ── Submit Button ── */
+    .btn-submit {
+      display: block;
+      width: 100%;
+      padding: 0.9rem;
+      margin-top: 1.5rem;
+      font-size: 1.05rem;
+      font-weight: 700;
+      font-family: inherit;
+      color: var(--navy);
+      background: var(--yellow);
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      letter-spacing: 0.01em;
+    }
+
+    .btn-submit:hover { background: var(--yellow-hover); }
+    .btn-submit:active { transform: scale(0.985); }
+
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ── Spinner ── */
+    .spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2.5px solid var(--navy);
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 0.5rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Messages ── */
+    .msg {
+      padding: 0.85rem 1rem;
+      border-radius: var(--radius);
+      font-size: 0.9rem;
+      margin-top: 1rem;
+      display: none;
+    }
+
+    .msg-success {
+      background: var(--success-bg);
+      border: 1.5px solid var(--success-border);
+      color: var(--success-text);
+    }
+
+    .msg-error {
+      background: #fef2f2;
+      border: 1.5px solid var(--error);
+      color: var(--error);
+    }
+
+    .msg.visible { display: block; }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center;
+      padding: 1.5rem 1rem;
+      font-size: 0.75rem;
+      color: var(--text-light);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <h1><span class="header-accent">CAT</span> Informes</h1>
+    <p>Reporte de Misiones — Agentes de Tránsito</p>
+  </header>
+
+  <main class="container">
+    <form id="reportForm" novalidate>
+
+      <!-- Comuna -->
+      <div class="form-group">
+        <label for="comuna" class="required">Comuna</label>
+        <select id="comuna" required>
+          <option value="" disabled selected>Seleccioná una comuna</option>
+          <option value="1">Comuna 1</option>
+          <option value="2">Comuna 2</option>
+          <option value="3">Comuna 3</option>
+          <option value="4">Comuna 4</option>
+          <option value="5">Comuna 5</option>
+          <option value="6">Comuna 6</option>
+          <option value="7">Comuna 7</option>
+          <option value="8">Comuna 8</option>
+          <option value="9">Comuna 9</option>
+          <option value="10">Comuna 10</option>
+          <option value="11">Comuna 11</option>
+          <option value="12">Comuna 12</option>
+          <option value="13">Comuna 13</option>
+          <option value="14">Comuna 14</option>
+          <option value="15">Comuna 15</option>
+        </select>
+      </div>
+
+      <!-- Nombre -->
+      <div class="form-group">
+        <label for="nombre" class="required">Nombre</label>
+        <input type="text" id="nombre" placeholder="Quien reporta" required autocomplete="name">
+      </div>
+
+      <!-- Agentes -->
+      <div class="form-group">
+        <label for="agentes" class="required">Agentes</label>
+        <input type="text" id="agentes" placeholder="Nombres de los agentes" required>
+      </div>
+
+      <!-- Ubicación -->
+      <div class="form-group">
+        <label for="ubicacion" class="required">Ubicación</label>
+        <input type="text" id="ubicacion" placeholder="Dirección o intersección" required>
+      </div>
+
+      <!-- Tipo de tarea -->
+      <div class="form-group">
+        <label for="tarea" class="required">Tipo de tarea</label>
+        <select id="tarea" required>
+          <option value="" disabled selected>Seleccioná el tipo de tarea</option>
+          <option value="Reordenamiento vehicular">Reordenamiento vehicular</option>
+          <option value="Control de estacionamiento">Control de estacionamiento</option>
+          <option value="Operativo especial">Operativo especial</option>
+          <option value="Escolar">Escolar</option>
+          <option value="Recorrido / relevamiento">Recorrido / relevamiento</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
+
+      <!-- Novedad -->
+      <div class="form-group">
+        <label for="novedad">Novedad <span style="font-weight:400;color:var(--text-light)">(opcional)</span></label>
+        <textarea id="novedad" placeholder="Observaciones o novedades"></textarea>
+      </div>
+
+      <button type="submit" class="btn-submit" id="btnSubmit">Enviar reporte</button>
+
+      <div id="msgSuccess" class="msg msg-success">
+        Reporte enviado correctamente.
+      </div>
+      <div id="msgError" class="msg msg-error">
+        Error al enviar. Intentá de nuevo.
+      </div>
+
+    </form>
+  </main>
+
+  <footer class="footer">
+    Ciudad Autónoma de Buenos Aires — Cuerpo de Agentes de Tránsito
+  </footer>
+
+  <script>
+    // ╔══════════════════════════════════════════════════════════════╗
+    // ║  CONFIGURACIÓN — Reemplazá esta URL por tu endpoint de     ║
+    // ║  Google Apps Script una vez que lo hayas deployado.         ║
+    // ╚══════════════════════════════════════════════════════════════╝
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/TU_SCRIPT_ID/exec';
+
+    const form      = document.getElementById('reportForm');
+    const btn       = document.getElementById('btnSubmit');
+    const msgOk     = document.getElementById('msgSuccess');
+    const msgErr    = document.getElementById('msgError');
+
+    function hideMessages() {
+      msgOk.classList.remove('visible');
+      msgErr.classList.remove('visible');
+    }
+
+    function setLoading(loading) {
+      btn.disabled = loading;
+      btn.innerHTML = loading
+        ? '<span class="spinner"></span>Enviando…'
+        : 'Enviar reporte';
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideMessages();
+
+      // Validar campos requeridos
+      const campos = ['comuna', 'nombre', 'agentes', 'ubicacion', 'tarea'];
+      for (const id of campos) {
+        const el = document.getElementById(id);
+        if (!el.value.trim()) {
+          el.focus();
+          return;
+        }
+      }
+
+      const payload = {
+        comuna:    document.getElementById('comuna').value,
+        nombre:    document.getElementById('nombre').value.trim(),
+        agentes:   document.getElementById('agentes').value.trim(),
+        ubicacion: document.getElementById('ubicacion').value.trim(),
+        tarea:     document.getElementById('tarea').value,
+        novedad:   document.getElementById('novedad').value.trim(),
+      };
+
+      setLoading(true);
+
+      try {
+        const res = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload),
+          mode: 'no-cors',
+        });
+
+        // no-cors siempre devuelve opaque response, asumimos éxito
+        msgOk.classList.add('visible');
+        form.reset();
+
+        // Scroll al mensaje de éxito
+        msgOk.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      } catch (err) {
+        console.error('Error al enviar:', err);
+        msgErr.classList.add('visible');
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    // Ocultar mensajes cuando el usuario empieza a editar
+    form.addEventListener('input', hideMessages);
+  </script>
+</body>
+</html>
