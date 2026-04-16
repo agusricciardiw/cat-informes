@@ -69,10 +69,42 @@ function doPost(e) {
 }
 
 /**
- * Maneja peticiones GET (útil para verificar que el script está activo).
+ * Maneja peticiones GET — recibe los datos como query params.
  */
 function doGet(e) {
-  return ContentService
-    .createTextOutput(JSON.stringify({ status: 'ok', message: 'CAT Informes API activa' }))
-    .setMimeType(ContentService.MimeType.JSON);
+  try {
+    // Si no hay parámetros, es un health check
+    if (!e.parameter.comuna) {
+      return ContentService
+        .createTextOutput(JSON.stringify({ status: 'ok', message: 'CAT Informes API activa' }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    var sheet = SpreadsheetApp.openById('1-bJpZnM5WekAGdTunRPytSEoPTyiJGO1Tm3wqdlrxaU').getActiveSheet();
+    var data = e.parameter;
+
+    var ahora = new Date();
+    var fecha = Utilities.formatDate(ahora, 'America/Argentina/Buenos_Aires', 'dd/MM/yyyy');
+    var hora  = Utilities.formatDate(ahora, 'America/Argentina/Buenos_Aires', 'HH:mm:ss');
+
+    sheet.appendRow([
+      fecha,
+      hora,
+      data.comuna    || '',
+      data.nombre    || '',
+      data.agentes   || '',
+      data.ubicacion || '',
+      data.tarea     || '',
+      data.novedad   || ''
+    ]);
+
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: 'ok' }))
+      .setMimeType(ContentService.MimeType.JSON);
+
+  } catch (error) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: 'error', message: error.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
 }
