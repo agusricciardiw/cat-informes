@@ -37,7 +37,7 @@
  */
 function doPost(e) {
   try {
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var sheet = SpreadsheetApp.openById('1-bJpZnM5WekAGdTunRPytSEoPTyiJGO1Tm3wqdlrxaU').getActiveSheet();
     var data = JSON.parse(e.postData.contents);
 
     // Fecha y hora en zona horaria de Argentina
